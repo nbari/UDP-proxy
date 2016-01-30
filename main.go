@@ -1,4 +1,4 @@
-package main
+package UDPProxy
 
 import (
 	"log"
@@ -10,7 +10,7 @@ func handlePacket(i int, addr *net.UDPAddr, buf []byte) {
 	return
 }
 
-func main() {
+func Start() {
 	UDPAddr, err := net.ResolveUDPAddr("udp", ":5514")
 	if err != nil {
 		log.Fatal(err)
