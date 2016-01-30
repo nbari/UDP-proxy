@@ -5,6 +5,11 @@ import (
 	"net"
 )
 
+func handlePacket(i int, addr *net.UDPAddr, buf []byte) {
+	log.Println("Received ", string(buf[0:i]), " from ", addr)
+	return
+}
+
 func main() {
 	UDPAddr, err := net.ResolveUDPAddr("udp", ":5514")
 	if err != nil {
@@ -12,6 +17,7 @@ func main() {
 	}
 
 	conn, err := net.ListenUDP("udp", UDPAddr)
+	defer conn.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -20,11 +26,9 @@ func main() {
 
 	for {
 		n, addr, err := conn.ReadFromUDP(buf)
-		log.Println("Received ", string(buf[0:n]), " from ", addr)
-
+		go handlePacket(n, addr, buf)
 		if err != nil {
 			log.Println("Error: ", err)
 		}
 	}
-
 }
