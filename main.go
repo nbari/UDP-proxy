@@ -27,9 +27,10 @@ func Start(bind string) {
 
 	for {
 		n, addr, err := conn.ReadFromUDP(buf)
-		go handlePacket(n, addr, buf)
 		if err != nil {
 			log.Println("Error: ", err)
+		} else {
+			go handlePacket(n, addr, buf)
 		}
 	}
 }
