@@ -20,7 +20,7 @@ build: get
 	fi;
 
 clean:
-	@rm -f ${BIN_NAME} ${BIN_NAME}.debug *.out
+	@rm -rf ${BIN_NAME} ${BIN_NAME}.debug *.out build debian
 
 test: get
 	${GO} test -v
