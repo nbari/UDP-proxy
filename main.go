@@ -10,8 +10,9 @@ func handlePacket(i int, addr *net.UDPAddr, buf []byte) {
 	return
 }
 
-func Start() {
-	UDPAddr, err := net.ResolveUDPAddr("udp", ":5514")
+func Start(bind string) {
+
+	UDPAddr, err := net.ResolveUDPAddr("udp", bind)
 	if err != nil {
 		log.Fatal(err)
 	}
