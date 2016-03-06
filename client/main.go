@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	ServerAddr, err := net.ResolveUDPAddr("udp", "127.0.0.1:5514")
+	ServerAddr, err := net.ResolveUDPAddr("udp", "127.0.0.1:1514")
 	if err != nil {
 		log.Fatal(err)
 	}
