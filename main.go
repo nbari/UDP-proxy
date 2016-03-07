@@ -5,39 +5,43 @@ import (
 	"net"
 )
 
-func handlePacket(i int, addr *net.UDPAddr, buf []byte, tcp *net.TCPAddr) {
-	rConn, err := net.DialTCP("tcp", nil, tcp)
-	if err != nil {
-		panic(err)
-	}
-	defer rConn.Close()
-
-	if _, err := rConn.Write(buf[0:i]); err != nil {
-		panic(err)
-	}
-	log.Printf("sent:\n%s", buf[0:i])
-	return
+type UDPProxy struct {
+	local *net.UDPConn
+	tcp   *net.TCPAddr
+	udp   *net.UDPAddr
+	debug bool
 }
 
-func Start(bind string, tcp *net.TCPAddr) {
-	UDPAddr, err := net.ResolveUDPAddr("udp", bind)
+func New(bind string, tcp *net.TCPAddr, udp *net.UDPAddr) *UDPProxy {
+	addr, err := net.ResolveUDPAddr("udp", bind)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	conn, err := net.ListenUDP("udp", UDPAddr)
+	conn, err := net.ListenUDP("udp", addr)
 	defer conn.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	proxy := &UDPProxy{}
+	proxy.local = conn
+
+	return proxy
+}
+
+func (self *UDPProxy) Start() {
 	buf := make([]byte, 1024)
 	for {
-		n, addr, err := conn.ReadFromUDP(buf)
+		n, _, err := self.local.ReadFromUDP(buf)
 		if err != nil {
 			log.Println("Error: ", err)
 		} else {
-			go handlePacket(n, addr, buf, tcp)
+			if self.udp != nil {
+				go self.handlePacketUDP(n, buf)
+			} else {
+				go self.handlePacketTCP(n, buf)
+			}
 		}
 	}
 }
