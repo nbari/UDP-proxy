@@ -24,7 +24,7 @@ func main() {
 
 	var proxy *UDPProxy.UDPProxy
 
-	// udp or tcp
+	// UDP or TCP
 	if *udp != "" {
 		addr, err := net.ResolveUDPAddr("udp", *udp)
 		if err != nil {
