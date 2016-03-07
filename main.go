@@ -19,13 +19,15 @@ func New(bind string, tcp *net.TCPAddr, udp *net.UDPAddr) *UDPProxy {
 	}
 
 	conn, err := net.ListenUDP("udp", addr)
-	defer conn.Close()
+	//	defer conn.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	proxy := &UDPProxy{}
 	proxy.local = conn
+	proxy.tcp = tcp
+	proxy.udp = udp
 
 	return proxy
 }
