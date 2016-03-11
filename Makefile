@@ -1,9 +1,11 @@
 .PHONY: all get test clean build cover compile goxc bintray
 
+VERSION=1.0.0
 GO ?= go
 BIN_NAME=UDP-proxy
 GO_XC = ${GOPATH}/bin/goxc -os="freebsd openbsd netbsd solaris dragonfly darwin linux"
 GOXC_FILE = .goxc.local.json
+GITHASH=`git rev-parse HEAD`
 
 all: clean build
 
@@ -11,16 +13,10 @@ get:
 	${GO} get
 
 build: get
-# make build DEBUG=true
-	@if test -n "${DEBUG}"; then \
-	${GO} get -u github.com/mailgun/godebug; \
-	${GOPATH}/bin/godebug build -instrument="github.com/nbari/UDP-proxy/..." -o ${BIN_NAME}.debug cmd/UDP-proxy/main.go; \
-	else \
-	${GO} build -o ${BIN_NAME} cmd/UDP-proxy/main.go; \
-	fi;
+	${GO} build -ldflags "-X main.version=${VERSION} -X main.githash=${GITHASH}" -o ${BIN_NAME} cmd/UDP-proxy/main.go;
 
 clean:
-	@rm -f ${BIN_NAME} ${BIN_NAME}.debug *.out
+	@rm -rf ${BIN_NAME} ${BIN_NAME}.debug *.out build debian
 
 test: get
 	${GO} test -v

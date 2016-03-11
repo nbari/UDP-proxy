@@ -1,34 +1,52 @@
-package main
+package UDPProxy
 
 import (
 	"log"
 	"net"
 )
 
-func handlePacket(i int, addr *net.UDPAddr, buf []byte) {
-	log.Println("Received ", string(buf[0:i]), " from ", addr)
-	return
+type UDPProxy struct {
+	local *net.UDPConn
+	tcp   *net.TCPAddr
+	udp   *net.UDPAddr
+	debug bool
 }
 
-func main() {
-	UDPAddr, err := net.ResolveUDPAddr("udp", ":5514")
+func New(bind string, tcp *net.TCPAddr, udp *net.UDPAddr) *UDPProxy {
+	addr, err := net.ResolveUDPAddr("udp", bind)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	conn, err := net.ListenUDP("udp", UDPAddr)
-	defer conn.Close()
+	conn, err := net.ListenUDP("udp", addr)
+	//	defer conn.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	proxy := &UDPProxy{}
+	proxy.local = conn
+	proxy.tcp = tcp
+	proxy.udp = udp
+
+	return proxy
+}
+
+func (self *UDPProxy) Start(debug bool) {
+	if debug {
+		self.debug = true
+	}
 	buf := make([]byte, 1024)
-
 	for {
-		n, addr, err := conn.ReadFromUDP(buf)
-		go handlePacket(n, addr, buf)
+		n, _, err := self.local.ReadFromUDP(buf)
 		if err != nil {
 			log.Println("Error: ", err)
+		} else {
+			if self.udp != nil {
+				go self.handlePacketUDP(n, buf)
+			} else {
+				go self.handlePacketTCP(n, buf)
+			}
 		}
 	}
 }
