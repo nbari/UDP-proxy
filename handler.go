@@ -17,13 +17,13 @@ func (self *UDPProxy) handlePacketTCP(i int, buf []byte) {
 	}
 
 	if self.debug {
-		log.Printf("sent:\n%s", buf[0:i])
+		log.Println(buf[0:i])
 	}
 	return
 }
 
 func (self *UDPProxy) handlePacketUDP(i int, buf []byte) {
-	rConn, err := net.DialUDP("tcp", nil, self.udp)
+	rConn, err := net.DialUDP("udp", nil, self.udp)
 	if err != nil {
 		panic(err)
 	}
@@ -34,7 +34,7 @@ func (self *UDPProxy) handlePacketUDP(i int, buf []byte) {
 	}
 
 	if self.debug {
-		log.Printf("sent:\n%s", buf[0:i])
+		log.Println(buf[0:i])
 	}
 	return
 }
