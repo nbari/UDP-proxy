@@ -17,7 +17,7 @@ func (self *UDPProxy) handlePacketTCP(i int, buf []byte) {
 	}
 
 	if self.debug {
-		log.Println(buf[0:i])
+		log.Println(string(buf[0:i]))
 	}
 	return
 }
@@ -34,7 +34,7 @@ func (self *UDPProxy) handlePacketUDP(i int, buf []byte) {
 	}
 
 	if self.debug {
-		log.Println(buf[0:i])
+		log.Println(string(buf[0:i]))
 	}
 	return
 }

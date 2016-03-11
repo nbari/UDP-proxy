@@ -32,7 +32,10 @@ func New(bind string, tcp *net.TCPAddr, udp *net.UDPAddr) *UDPProxy {
 	return proxy
 }
 
-func (self *UDPProxy) Start() {
+func (self *UDPProxy) Start(debug bool) {
+	if debug {
+		self.debug = true
+	}
 	buf := make([]byte, 1024)
 	for {
 		n, _, err := self.local.ReadFromUDP(buf)
