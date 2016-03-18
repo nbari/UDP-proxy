@@ -15,7 +15,7 @@ type UDPProxy struct {
 func New(bind string, tcp *net.TCPAddr, udp *net.UDPAddr) *UDPProxy {
 	addr, err := net.ResolveUDPAddr("udp", bind)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
 
 	conn, err := net.ListenUDP("udp", addr)
