@@ -19,7 +19,6 @@ func New(bind string, tcp *net.TCPAddr, udp *net.UDPAddr) *UDPProxy {
 	}
 
 	conn, err := net.ListenUDP("udp", addr)
-	//	defer conn.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -33,6 +32,7 @@ func New(bind string, tcp *net.TCPAddr, udp *net.UDPAddr) *UDPProxy {
 }
 
 func (self *UDPProxy) Start(debug bool) {
+	defer self.local.Close()
 	if debug {
 		self.debug = true
 	}
