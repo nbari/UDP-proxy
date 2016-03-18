@@ -51,10 +51,8 @@ func (self *UDPProxy) Start(debug bool) {
 		if err != nil {
 			log.Println(err)
 		} else {
-			client := &Client{}
-			client.addr = clientAddr
 			if self.udp != nil {
-				go self.handlePacketUDP(n, buffer, client)
+				go self.handlePacketUDP(n, buffer, clientAddr)
 			} else {
 				go self.handlePacketTCP(n, buffer)
 			}
