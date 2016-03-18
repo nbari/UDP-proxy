@@ -6,7 +6,6 @@ import (
 )
 
 type UDPProxy struct {
-	addr    *net.UDPAddr
 	conn    *net.UDPConn
 	tcp     *net.TCPAddr
 	udp     *net.UDPAddr
@@ -27,7 +26,6 @@ func New(bind string, tcp *net.TCPAddr, udp *net.UDPAddr) *UDPProxy {
 	}
 
 	proxy := &UDPProxy{}
-	proxy.addr = addr
 	proxy.conn = conn
 	proxy.tcp = tcp
 	proxy.udp = udp
@@ -42,16 +40,16 @@ func (self *UDPProxy) Start(debug bool) {
 		self.debug = true
 	}
 
-	buf := make([]byte, 1024)
+	var buffer = make([]byte, 0xffff)
 	for {
-		n, clientAddr, err := self.conn.ReadFromUDP(buf)
+		n, clientAddr, err := self.conn.ReadFromUDP(buffer)
 		if err != nil {
 			log.Println("Error: ", err)
 		} else {
 			if self.udp != nil {
-				go self.handlePacketUDP(n, buf, clientAddr)
+				go self.handlePacketUDP(n, buffer, clientAddr)
 			} else {
-				go self.handlePacketTCP(n, buf)
+				go self.handlePacketTCP(n, buffer)
 			}
 		}
 	}

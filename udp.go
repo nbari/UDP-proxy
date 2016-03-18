@@ -17,21 +17,22 @@ func (self *UDPProxy) handlePacketUDP(i int, buf []byte, client *net.UDPAddr) {
 	}
 
 	if self.debug {
-		log.Println(string(buf[0:i]))
+		log.Printf("Size: %d data: \n%s", i, buf[0:i])
 	}
 
 	self.txBytes += uint64(i)
 
-	//directional copy (64k buffer)
 	var buffer = make([]byte, 0xffff)
 	for {
+		// Read from server
 		n, err := rConn.Read(buffer[0:])
 		if err != nil {
 			log.Fatalln(err)
 		}
 		self.rxBytes += uint64(n)
 
-		n, err = self.conn.WriteToUDP(buffer[0:n], client)
+		// Relay it to client
+		_, err = self.conn.WriteToUDP(buffer[0:n], client)
 		if err != nil {
 			log.Fatalln(err)
 		}
