@@ -49,7 +49,7 @@ func (self *UDPProxy) Start(debug bool) {
 	for {
 		n, clientAddr, err := self.conn.ReadFromUDP(buffer)
 		if err != nil {
-			log.Println("Error: ", err)
+			log.Println(err)
 		} else {
 			client := &Client{}
 			client.addr = clientAddr

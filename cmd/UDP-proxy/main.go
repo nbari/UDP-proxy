@@ -15,7 +15,7 @@ func main() {
 	var r = flag.String("r", "", "remote host:port")
 	var f = flag.Bool("f", false, "forward only UDP -> TCP")
 	var v = flag.Bool("v", false, fmt.Sprintf("Print version: %s", version))
-	var d = flag.Bool("d", false, "Debug mode.")
+	var d = flag.Bool("d", false, "Debug mode")
 
 	flag.Parse()
 
@@ -30,17 +30,24 @@ func main() {
 
 	var proxy *UDPProxy.UDPProxy
 
+	if *r == "" {
+		fmt.Println("-r remote host:port required")
+		os.Exit(1)
+	}
+
 	// UDP or TCP
 	if *f {
 		addr, err := net.ResolveTCPAddr("tcp", *r)
 		if err != nil {
-			panic(err)
+			fmt.Println(err)
+			os.Exit(1)
 		}
 		proxy = UDPProxy.New(*b, addr, nil)
 	} else {
 		addr, err := net.ResolveUDPAddr("udp", *r)
 		if err != nil {
-			panic(err)
+			fmt.Println(err)
+			os.Exit(1)
 		}
 		proxy = UDPProxy.New(*b, nil, addr)
 	}
