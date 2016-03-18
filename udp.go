@@ -14,11 +14,8 @@ func (self *UDPProxy) handlePacketUDP(i int, buf []byte, c *Client) {
 	c.conn = rConn
 
 	if _, err := rConn.Write(buf[0:i]); err != nil {
-		log.Fatalln(err)
-	}
-
-	if self.debug {
-		log.Printf("Size: %d data: \n%s", i, buf[0:i])
+		log.Printf("Client: %s err: %s", c.addr.String(), err)
+		return
 	}
 
 	self.txBytes += uint64(i)

@@ -10,14 +10,15 @@ func (self *UDPProxy) handlePacketTCP(i int, buf []byte, c *Client) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	defer rConn.Close()
+
+	c.conn = rConn
 
 	if _, err := rConn.Write(buf[0:i]); err != nil {
-		log.Fatalln(err)
+		log.Printf("Client: %s err: %s", c.addr.String(), err)
+		return
 	}
 
-	if self.debug {
-		log.Println(string(buf[0:i]))
-	}
-	return
+	self.txBytes += uint64(i)
+
+	go self.rw(c)
 }
