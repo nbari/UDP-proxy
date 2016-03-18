@@ -12,10 +12,10 @@ var version, githash string
 
 func main() {
 	var b = flag.String("b", ":1514", "bind to host:port")
-	var d = flag.Bool("d", false, "Debug mode.")
-	var f = flag.String("f", "", "forward to host:port")
-	var u = flag.Bool("u", false, "forward using UDP instead of TCP")
+	var r = flag.String("r", "", "remote host:port")
+	var f = flag.Bool("f", false, "forward only UDP -> TCP")
 	var v = flag.Bool("v", false, fmt.Sprintf("Print version: %s", version))
+	var d = flag.Bool("d", false, "Debug mode.")
 
 	flag.Parse()
 
@@ -31,18 +31,18 @@ func main() {
 	var proxy *UDPProxy.UDPProxy
 
 	// UDP or TCP
-	if *u {
-		addr, err := net.ResolveUDPAddr("udp", *f)
-		if err != nil {
-			panic(err)
-		}
-		proxy = UDPProxy.New(*b, nil, addr)
-	} else {
-		addr, err := net.ResolveTCPAddr("tcp", *f)
+	if *f {
+		addr, err := net.ResolveTCPAddr("tcp", *r)
 		if err != nil {
 			panic(err)
 		}
 		proxy = UDPProxy.New(*b, addr, nil)
+	} else {
+		addr, err := net.ResolveUDPAddr("udp", *r)
+		if err != nil {
+			panic(err)
+		}
+		proxy = UDPProxy.New(*b, nil, addr)
 	}
 
 	// start

@@ -5,20 +5,19 @@ import (
 	"net"
 )
 
-func (self *UDPProxy) handlePacketTCP(i int, buf []byte, c *Client) {
+func (self *UDPProxy) handlePacketTCP(i int, buf []byte) {
 	rConn, err := net.DialTCP("tcp", nil, self.tcp)
 	if err != nil {
 		log.Fatalln(err)
 	}
-
-	c.conn = rConn
+	defer rConn.Close()
 
 	if _, err := rConn.Write(buf[0:i]); err != nil {
-		log.Printf("Client: %s err: %s", c.addr.String(), err)
+		log.Println(err)
 		return
 	}
 
 	self.txBytes += uint64(i)
 
-	go self.rw(c)
+	return
 }

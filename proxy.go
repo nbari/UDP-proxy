@@ -16,7 +16,7 @@ type UDPProxy struct {
 
 type Client struct {
 	addr *net.UDPAddr
-	conn interface{}
+	conn *net.UDPConn
 }
 
 func New(bind string, tcp *net.TCPAddr, udp *net.UDPAddr) *UDPProxy {
@@ -56,7 +56,7 @@ func (self *UDPProxy) Start(debug bool) {
 			if self.udp != nil {
 				go self.handlePacketUDP(n, buffer, client)
 			} else {
-				go self.handlePacketTCP(n, buffer, client)
+				go self.handlePacketTCP(n, buffer)
 			}
 		}
 	}

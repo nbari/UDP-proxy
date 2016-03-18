@@ -2,26 +2,14 @@ package UDPProxy
 
 import (
 	"log"
-	"net"
 )
 
 func (self *UDPProxy) rw(c *Client) {
-	var (
-		buffer = make([]byte, 0xffff)
-		err    error
-		n      int
-	)
-
+	var buffer = make([]byte, 0xffff)
 	for {
 		// Read from server
-		switch v := c.conn.(type) {
-		case *net.UDPConn:
-			defer v.Close()
-			n, err = v.Read(buffer[0:])
-		case *net.TCPConn:
-			defer v.Close()
-			n, err = v.Read(buffer[0:])
-		}
+		defer c.conn.Close()
+		n, err := c.conn.Read(buffer[0:])
 
 		if err != nil {
 			log.Printf("Client: %s err: %s", c.addr.String(), err)

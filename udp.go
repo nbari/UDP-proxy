@@ -6,14 +6,13 @@ import (
 )
 
 func (self *UDPProxy) handlePacketUDP(i int, buf []byte, c *Client) {
-	rConn, err := net.DialUDP("udp", nil, self.udp)
+	var err error
+	c.conn, err = net.DialUDP("udp", nil, self.udp)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	c.conn = rConn
-
-	if _, err := rConn.Write(buf[0:i]); err != nil {
+	if _, err := c.conn.Write(buf[0:i]); err != nil {
 		log.Printf("Client: %s err: %s", c.addr.String(), err)
 		return
 	}
