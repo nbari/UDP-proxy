@@ -1,7 +1,7 @@
 # UDP-proxy
 
-**UDP-proxy**, listen on an UDP port (default 1514) and forwards the traffic to a
-TCP or UDP host.
+**UDP-proxy**, listens on an UDP port (default :1514) and forwards the traffic
+via TCP or UDP to a remote host.
 
 Why ?
 =====
@@ -17,9 +17,12 @@ Use case
 
 [runit](http://smarden.org/runit/)/[svlogd](http://smarden.org/runit/svlogd.8.html) + [papertrail](https://papertrailapp.com/)
 
-runit is using to keep up and running the application, while keeping logs in ``log/main/current`` but at the same time is required to send logs to papertrail.
+runit is used to keep up and running the application, while keeping logs
+in ``log/main/current`` but at the same time is required to send logs to
+papertrail.
 
-To do this, ``svlogd`` needs a Config file located in ``log/main/config`` directory, contents of the file could be something like:
+To do this, ``svlogd`` needs a Config file located in ``log/main/config``
+directory, contents of the file could be something like:
 
     s1000000
     n10
@@ -41,27 +44,19 @@ private networks only.
 
 Setting **UDP-proxy** to forward logs to **papertrail** is straight forward:
 
-    UDP-proxy -f logs.papertrailapp.com:61653
+    UDP-proxy -r logs.papertrailapp.com:61653 -f
 
 This will start **UDP-proxy** listening on port ``127.0.0.1:1514`` and forward via
 TCP all request to ``logs.papertrailapp.com:61653``.
 
 
+DNS proxy
+=========
 
-Testing
-=======
+To proxy all request to dns.watch:
 
-You can use the included test client ``client/main`` and
-[netcat](https://en.wikipedia.org/wiki/Netcat) to receive the
-requests, first start **UDP-proxy**:
+    UDP-proxy -b 127.0.0l1:5253 -r resolver1.dns.watch:53
 
-    UDP-proxy -f localhost:9090 -d
+Test the proxy using dig:
 
-Next netcat to keep listening on port 9090:
-
-    nc -lk 9090
-
-And at the end start the client:
-
-    $ cd client
-    $ go run main.go
+    dig @127.0.0.1 -p 5253 github.com mx
