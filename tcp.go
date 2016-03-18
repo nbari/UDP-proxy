@@ -5,7 +5,7 @@ import (
 	"net"
 )
 
-func (self *UDPProxy) handlePacketTCP(i int, buf []byte) {
+func (self *UDPProxy) handlePacketTCP(i int, buf []byte, c *Client) {
 	rConn, err := net.DialTCP("tcp", nil, self.tcp)
 	if err != nil {
 		log.Fatalln(err)

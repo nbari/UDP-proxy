@@ -5,12 +5,13 @@ import (
 	"net"
 )
 
-func (self *UDPProxy) handlePacketUDP(i int, buf []byte, client *net.UDPAddr) {
+func (self *UDPProxy) handlePacketUDP(i int, buf []byte, c *Client) {
 	rConn, err := net.DialUDP("udp", nil, self.udp)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	defer rConn.Close()
+
+	c.conn = rConn
 
 	if _, err := rConn.Write(buf[0:i]); err != nil {
 		log.Fatalln(err)
@@ -22,20 +23,5 @@ func (self *UDPProxy) handlePacketUDP(i int, buf []byte, client *net.UDPAddr) {
 
 	self.txBytes += uint64(i)
 
-	var buffer = make([]byte, 0xffff)
-	for {
-		// Read from server
-		n, err := rConn.Read(buffer[0:])
-		if err != nil {
-			log.Fatalln(err)
-		}
-		self.rxBytes += uint64(n)
-
-		// Relay it to client
-		_, err = self.conn.WriteToUDP(buffer[0:n], client)
-		if err != nil {
-			log.Fatalln(err)
-		}
-	}
-	return
+	go self.rw(c)
 }

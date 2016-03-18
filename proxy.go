@@ -14,6 +14,11 @@ type UDPProxy struct {
 	debug   bool
 }
 
+type Client struct {
+	addr *net.UDPAddr
+	conn interface{}
+}
+
 func New(bind string, tcp *net.TCPAddr, udp *net.UDPAddr) *UDPProxy {
 	addr, err := net.ResolveUDPAddr("udp", bind)
 	if err != nil {
@@ -46,10 +51,12 @@ func (self *UDPProxy) Start(debug bool) {
 		if err != nil {
 			log.Println("Error: ", err)
 		} else {
+			client := &Client{}
+			client.addr = clientAddr
 			if self.udp != nil {
-				go self.handlePacketUDP(n, buffer, clientAddr)
+				go self.handlePacketUDP(n, buffer, client)
 			} else {
-				go self.handlePacketTCP(n, buffer)
+				go self.handlePacketTCP(n, buffer, client)
 			}
 		}
 	}
