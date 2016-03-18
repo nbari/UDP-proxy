@@ -25,6 +25,4 @@ func (self *UDPProxy) rw(c *Client) {
 			return
 		}
 	}
-
-	return
 }
