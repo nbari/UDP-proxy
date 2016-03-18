@@ -20,7 +20,7 @@ func New(bind string, tcp *net.TCPAddr, udp *net.UDPAddr) *UDPProxy {
 
 	conn, err := net.ListenUDP("udp", addr)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
 
 	proxy := &UDPProxy{}
@@ -33,9 +33,11 @@ func New(bind string, tcp *net.TCPAddr, udp *net.UDPAddr) *UDPProxy {
 
 func (self *UDPProxy) Start(debug bool) {
 	defer self.local.Close()
+
 	if debug {
 		self.debug = true
 	}
+
 	buf := make([]byte, 1024)
 	for {
 		n, _, err := self.local.ReadFromUDP(buf)
