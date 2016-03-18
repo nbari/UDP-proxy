@@ -1,14 +1,17 @@
 {
-    "ConfigVersion": "0.9",
-    "AppName": "UDP-proxy",
-    "ArtifactsDest": "build",
-    "PackageVersion": "0.1.0",
-    "TaskSettings": {
-        "bintray": {
-            "downloadspage": "bintray.md",
-            "package": "UDP-proxy",
-            "repository": "UDP-proxy",
-            "subject": "nbari"
-        }
+  "ConfigVersion": "0.9",
+  "AppName": "UDP-proxy",
+  "ArtifactsDest": "build",
+  "PackageVersion": "0.2.0",
+  "TaskSettings": {
+    "bintray": {
+      "downloadspage": "bintray.md",
+      "package": "UDP-proxy",
+      "repository": "UDP-proxy",
+      "subject": "nbari"
     }
+  },
+  "BuildSettings": {
+    "LdFlags": "-X main.version=0.2.0 -X main.githash=47be4bfc413878b9ee8ce85def63cf3669365a02"
+  }
 }
