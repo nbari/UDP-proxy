@@ -14,9 +14,8 @@ type UDPProxy struct {
 	debug   bool
 }
 
-type Client struct {
-	addr *net.UDPAddr
-	conn *net.UDPConn
+type Backend struct {
+	conn interface{}
 }
 
 func New(bind string, tcp *net.TCPAddr, udp *net.UDPAddr) *UDPProxy {
@@ -39,10 +38,20 @@ func New(bind string, tcp *net.TCPAddr, udp *net.UDPAddr) *UDPProxy {
 }
 
 func (self *UDPProxy) Start(debug bool) {
-	defer self.conn.Close()
-
 	if debug {
 		self.debug = true
+	}
+
+	var (
+		backend = &Backend{}
+		err     error
+	)
+
+	if self.udp != nil {
+		backend.conn, err = net.DialUDP("udp", nil, self.udp)
+	}
+	if err != nil {
+		log.Fatalln(err)
 	}
 
 	var buffer = make([]byte, 0xffff)
@@ -51,11 +60,7 @@ func (self *UDPProxy) Start(debug bool) {
 		if err != nil {
 			log.Println(err)
 		} else {
-			if self.udp != nil {
-				go self.handlePacketUDP(n, buffer, clientAddr)
-			} else {
-				go self.handlePacketTCP(n, buffer)
-			}
+			go self.handlePacket(buffer[0:n], clientAddr, backend)
 		}
 	}
 }
