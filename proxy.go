@@ -28,9 +28,11 @@ func New(lconn *net.UDPConn, c, r *net.UDPAddr, d bool) *UDPProxy {
 }
 
 func (self *UDPProxy) Start(data []byte) {
-	_, err := self.rconn.Write(data)
+	n, err := self.rconn.Write(data)
 	if err != nil {
 		log.Println(err)
 	}
+	self.txBytes += uint64(n)
+	log.Printf("Sent Bytes: %d", self.txBytes)
 	go self.handlePacket()
 }

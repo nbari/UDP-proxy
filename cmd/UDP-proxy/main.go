@@ -19,11 +19,12 @@ func main() {
 		v         = flag.Bool("v", false, fmt.Sprintf("Print version: %s", version))
 		d         = flag.Bool("d", false, "Debug mode")
 		raddr_udp *net.UDPAddr
-		buffer    = make([]byte, 0xffff)
+		buffer    = make([]byte, 1500)
 		err       error
 		clients   map[string]*UDPProxy.UDPProxy = make(map[string]*UDPProxy.UDPProxy)
 		proxy     *UDPProxy.UDPProxy
 		found     bool
+		counter   uint64
 	)
 	//raddr_tcp *net.TCPAddr
 
@@ -70,7 +71,6 @@ func main() {
 	log.Printf("UDP-Proxy listening on %s\n", addr.String())
 
 	// wait for connections
-	var counter uint64
 	for {
 		n, clientAddr, err := conn.ReadFromUDP(buffer)
 		if err != nil {
