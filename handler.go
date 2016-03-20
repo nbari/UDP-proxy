@@ -10,7 +10,7 @@ func (self *UDPProxy) handlePacket() {
 	for {
 		// Read from server
 		n, err := self.rconn.Read(buffer[0:])
-		log.Printf("reading..... n: %d, b= %x\n", n, buffer[0:n])
+		log.Printf("reading size %d\n", n)
 
 		if err != nil {
 			log.Printf("Client: %s err: %s", self.caddr.String(), err)

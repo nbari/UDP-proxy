@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	p "github.com/nbari/UDP-proxy"
+	"github.com/nbari/UDP-proxy"
 	"log"
 	"net"
 	"os"
@@ -21,6 +21,9 @@ func main() {
 		raddr_udp *net.UDPAddr
 		buffer    = make([]byte, 0xffff)
 		err       error
+		clients   map[string]*UDPProxy.UDPProxy = make(map[string]*UDPProxy.UDPProxy)
+		proxy     *UDPProxy.UDPProxy
+		found     bool
 	)
 	//raddr_tcp *net.TCPAddr
 
@@ -67,16 +70,23 @@ func main() {
 	log.Printf("UDP-Proxy listening on %s\n", addr.String())
 
 	// wait for connections
+	var counter uint64
 	for {
 		n, clientAddr, err := conn.ReadFromUDP(buffer)
 		if err != nil {
 			log.Println(err)
 		}
+		counter++
 		if *d {
 			log.Printf("new connection from %s", clientAddr.String())
 		}
-		// make new connection to remote server
-		proxy := p.New(conn, clientAddr, raddr_udp, *d)
+		fmt.Printf("Connections: %d, clients: %d\n", counter, len(clients))
+		proxy, found = clients[clientAddr.String()]
+		if !found {
+			// make new connection to remote server
+			proxy = UDPProxy.New(conn, clientAddr, raddr_udp, *d)
+			clients[clientAddr.String()] = proxy
+		}
 		go proxy.Start(buffer[0:n])
 	}
 
