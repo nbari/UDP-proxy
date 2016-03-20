@@ -62,3 +62,18 @@ To proxy all request to dns.watch:
 Test the proxy using dig:
 
     dig @127.0.0.1 -p 5253 github.com mx
+
+Iperf
+=====
+
+Listen on localhost port 5001:
+
+    UDP-proxy -r localhost:5001 -d
+
+Run iperf server:
+
+    iperf -s -u
+
+Connect the client:
+
+    iperf -u -c 127.0.0.1 -p 1514 -d
