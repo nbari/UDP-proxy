@@ -1,6 +1,6 @@
 .PHONY: all get test clean build cover compile goxc bintray
 
-VERSION=0.2.0
+VERSION=0.3.0
 GO ?= go
 BIN_NAME=UDP-proxy
 GO_XC = ${GOPATH}/bin/goxc -os="freebsd openbsd netbsd solaris dragonfly darwin linux"

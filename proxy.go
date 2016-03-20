@@ -6,58 +6,33 @@ import (
 )
 
 type UDPProxy struct {
-	conn    *net.UDPConn
-	tcp     *net.TCPAddr
-	udp     *net.UDPAddr
+	lconn   *net.UDPConn
+	rconn   *net.UDPConn
+	caddr   *net.UDPAddr
 	txBytes uint64
 	rxBytes uint64
 	debug   bool
 }
 
-type Client struct {
-	addr *net.UDPAddr
-	conn *net.UDPConn
+func New(lconn *net.UDPConn, c, r *net.UDPAddr, d bool) *UDPProxy {
+	rconn, err := net.DialUDP("udp", nil, r)
+	if err != nil {
+		log.Println(err)
+	}
+	return &UDPProxy{
+		lconn: lconn,
+		rconn: rconn,
+		caddr: c,
+		debug: d,
+	}
 }
 
-func New(bind string, tcp *net.TCPAddr, udp *net.UDPAddr) *UDPProxy {
-	addr, err := net.ResolveUDPAddr("udp", bind)
+func (self *UDPProxy) Start(data []byte) {
+	n, err := self.rconn.Write(data)
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
 	}
-
-	conn, err := net.ListenUDP("udp", addr)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	proxy := &UDPProxy{}
-	proxy.conn = conn
-	proxy.tcp = tcp
-	proxy.udp = udp
-
-	return proxy
-}
-
-func (self *UDPProxy) Start(debug bool) {
-	defer self.conn.Close()
-
-	if debug {
-		self.debug = true
-	}
-
-	var buffer = make([]byte, 0xffff)
-	for {
-		n, clientAddr, err := self.conn.ReadFromUDP(buffer)
-		if err != nil {
-			log.Println(err)
-		} else {
-			client := &Client{}
-			client.addr = clientAddr
-			if self.udp != nil {
-				go self.handlePacketUDP(n, buffer, client)
-			} else {
-				go self.handlePacketTCP(n, buffer)
-			}
-		}
-	}
+	self.txBytes += uint64(n)
+	log.Printf("Sent Bytes: %d", self.txBytes)
+	go self.handlePacket()
 }
