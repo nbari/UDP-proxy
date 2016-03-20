@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	p "github.com/nbari/UDP-proxy"
+	"log"
 	"net"
 	"os"
 )
@@ -17,11 +18,11 @@ func main() {
 		f         = flag.Bool("f", false, "forward only UDP -> TCP")
 		v         = flag.Bool("v", false, fmt.Sprintf("Print version: %s", version))
 		d         = flag.Bool("d", false, "Debug mode")
-		raddr_tcp *net.TCPAddr
 		raddr_udp *net.UDPAddr
 		buffer    = make([]byte, 0xffff)
 		err       error
 	)
+	//raddr_tcp *net.TCPAddr
 
 	flag.Parse()
 
@@ -41,7 +42,7 @@ func main() {
 
 	// UDP or TCP
 	if *f {
-		raddr_tcp, err = net.ResolveTCPAddr("tcp", *r)
+		// raddr_tcp, err = net.ResolveTCPAddr("tcp", *r)
 	} else {
 		raddr_udp, err = net.ResolveUDPAddr("udp", *r)
 	}
@@ -63,10 +64,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Printf("UDP-Proxy listening on %v port %d", addr.IP, addr.Port)
+	log.Printf("UDP-Proxy listening on %s\n", addr.String())
 
 	// wait for connections
-	var buffer = make([]byte, 0xffff)
 	for {
 		n, clientAddr, err := conn.ReadFromUDP(buffer)
 		if err != nil {
@@ -76,8 +76,8 @@ func main() {
 			log.Printf("new connection from %s", clientAddr.String())
 		}
 		// make new connection to remote server
-		proxy = p.New()
-
+		proxy := p.New(conn, clientAddr, raddr_udp, *d)
+		go proxy.Start(buffer[0:n])
 	}
 
 }
