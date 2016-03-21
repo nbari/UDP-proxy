@@ -57,7 +57,7 @@ DNS proxy
 
 To proxy all request to dns.watch:
 
-    UDP-proxy -b 127.0.0l1:5253 -r resolver1.dns.watch:53
+    UDP-proxy -b 127.0.0.1:5253 -r resolver1.dns.watch:53
 
 Test the proxy using dig:
 
