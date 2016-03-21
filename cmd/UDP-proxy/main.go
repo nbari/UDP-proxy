@@ -21,9 +21,7 @@ func main() {
 		raddr_udp *net.UDPAddr
 		buffer    = make([]byte, 1500)
 		err       error
-		clients   map[string]*UDPProxy.UDPProxy = make(map[string]*UDPProxy.UDPProxy)
 		proxy     *UDPProxy.UDPProxy
-		found     bool
 		counter   uint64
 	)
 	//raddr_tcp *net.TCPAddr
@@ -80,13 +78,8 @@ func main() {
 		if *d {
 			log.Printf("new connection from %s", clientAddr.String())
 		}
-		fmt.Printf("Connections: %d, clients: %d\n", counter, len(clients))
-		proxy, found = clients[clientAddr.String()]
-		if !found {
-			// make new connection to remote server
-			proxy = UDPProxy.New(conn, clientAddr, raddr_udp, *d)
-			clients[clientAddr.String()] = proxy
-		}
+		fmt.Printf("Connections: %d\n", counter)
+		proxy = UDPProxy.New(conn, clientAddr, raddr_udp, *d)
 		go proxy.Start(buffer[0:n])
 	}
 

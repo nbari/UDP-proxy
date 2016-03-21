@@ -10,8 +10,9 @@ func (self *UDPProxy) handlePacket() {
 	for {
 		// Read from server
 		n, err := self.rconn.Read(buffer[0:])
+		print("reading...")
 		if err != nil {
-			log.Printf("Client: %s err: %s", self.caddr.String(), err)
+			log.Printf("READ - client: %s err: %s", self.caddr.String(), err)
 			return
 		}
 		self.rxBytes += uint64(n)
@@ -19,8 +20,9 @@ func (self *UDPProxy) handlePacket() {
 
 		// Relay it to client
 		_, err = self.lconn.WriteToUDP(buffer[0:n], self.caddr)
+		print("writing...")
 		if err != nil {
-			log.Printf("Client: %s err: %s", self.caddr.String(), err)
+			log.Printf("WRITE - client: %s err: %s", self.caddr.String(), err)
 			return
 		}
 	}
