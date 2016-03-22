@@ -12,8 +12,8 @@ type Packet struct {
 
 const UDP_PACKET_SIZE = 1500
 
-func send(conn *net.UDPConn, outbound chan Packet) {
-	for packet := range outbound {
+func send(conn *net.UDPConn, inbound chan Packet) {
+	for packet := range inbound {
 		_, err := conn.WriteToUDP(packet.data, packet.addr)
 		if err != nil {
 			log.Println("Error on write: ", err)
