@@ -8,23 +8,22 @@ import (
 type UDPProxy struct {
 	lconn   *net.UDPConn
 	rconn   *net.UDPConn
-	caddr   *net.UDPAddr
 	txBytes uint64
 	rxBytes uint64
 	debug   bool
+	Counter uint64
 }
 
-func New(lconn *net.UDPConn, c, r *net.UDPAddr, d bool) *UDPProxy {
+func New(l *net.UDPConn, r *net.UDPAddr, d bool) (*UDPProxy, error) {
 	rconn, err := net.DialUDP("udp", nil, r)
 	if err != nil {
-		log.Println(err)
+		return nil, err
 	}
 	return &UDPProxy{
-		lconn: lconn,
+		lconn: l,
 		rconn: rconn,
-		caddr: c,
 		debug: d,
-	}
+	}, nil
 }
 
 func (self *UDPProxy) Start(data []byte) {
@@ -34,5 +33,5 @@ func (self *UDPProxy) Start(data []byte) {
 	}
 	self.txBytes += uint64(n)
 	log.Printf("Sent Bytes: %d", self.txBytes)
-	go self.handlePacket()
+	//	go self.handlePacket()
 }

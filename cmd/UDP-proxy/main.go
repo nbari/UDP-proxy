@@ -18,13 +18,11 @@ func main() {
 		f         = flag.Bool("f", false, "forward only UDP -> TCP")
 		v         = flag.Bool("v", false, fmt.Sprintf("Print version: %s", version))
 		d         = flag.Bool("d", false, "Debug mode")
-		raddr_udp *net.UDPAddr
 		buffer    = make([]byte, 1500)
-		err       error
-		proxy     *UDPProxy.UDPProxy
-		counter   uint64
+		raddr_udp *net.UDPAddr
+		//raddr_tcp *net.TCPAddr
+		err error
 	)
-	//raddr_tcp *net.TCPAddr
 
 	flag.Parse()
 
@@ -47,10 +45,10 @@ func main() {
 		// raddr_tcp, err = net.ResolveTCPAddr("tcp", *r)
 	} else {
 		raddr_udp, err = net.ResolveUDPAddr("udp", *r)
-	}
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 	}
 
 	// open local port to listen for incoming connections
@@ -66,21 +64,26 @@ func main() {
 		os.Exit(1)
 	}
 
+	p, err := UDPProxy.New(conn, raddr_udp, *d)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
 	log.Printf("UDP-Proxy listening on %s\n", addr.String())
 
 	// wait for connections
 	for {
 		n, clientAddr, err := conn.ReadFromUDP(buffer)
 		if err != nil {
-			log.Println(err)
+			log.Printf("Error: UDP read error: %v", err)
+			continue
 		}
-		counter++
+		p.Counter++
+		log.Printf("Connections: %d\n", p.Counter)
 		if *d {
-			log.Printf("new connection from %s", clientAddr.String())
+			log.Printf("New connection from %s read bytes: %d", clientAddr.String(), n)
 		}
-		fmt.Printf("Connections: %d\n", counter)
-		proxy = UDPProxy.New(conn, clientAddr, raddr_udp, *d)
-		go proxy.Start(buffer[0:n])
+		go p.HandlePack(UDPProxy.Packet{clientAddr, buffer[0:n]})
 	}
-
 }

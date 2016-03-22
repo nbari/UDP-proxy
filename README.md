@@ -77,3 +77,9 @@ Run iperf server:
 Connect the client:
 
     iperf -u -c 127.0.0.1 -p 1514 -d
+
+
+Netcat
+======
+
+    echo -n "hello" | nc -4u localhost 1514

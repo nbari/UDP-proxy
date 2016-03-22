@@ -3,9 +3,13 @@ package main
 import (
 	"log"
 	"net"
-	"strconv"
 	"time"
 )
+
+func close(c *net.UDPConn) {
+	log.Printf("closing: %s -> %s", c.LocalAddr().String(), c.RemoteAddr().String())
+	c.Close()
+}
 
 func main() {
 	ServerAddr, err := net.ResolveUDPAddr("udp", "127.0.0.1:1514")
@@ -18,16 +22,18 @@ func main() {
 		log.Fatal(err)
 	}
 
-	defer conn.Close()
-	i := 0
-	for {
-		msg := strconv.Itoa(i)
-		i++
-		buf := []byte(msg)
-		_, err := conn.Write(buf)
-		if err != nil {
-			log.Println(msg, err)
-		}
-		time.Sleep(time.Second * 1)
+	defer close(conn)
+
+	buf := []byte("hola")
+	_, err = conn.Write(buf)
+	if err != nil {
+		log.Println(err)
 	}
+
+	// receive message from server
+	buffer := make([]byte, 1500)
+	conn.SetReadDeadline(time.Now().Add(time.Second * 2))
+	n, addr, err := conn.ReadFromUDP(buffer)
+
+	log.Printf("Received from UDP server [%s]: size: %d msg: %s", addr.String(), n, buffer[:n])
 }
