@@ -20,7 +20,7 @@ func main() {
 		d         = flag.Bool("d", false, "Debug mode")
 		buffer    = make([]byte, 1500)
 		raddr_udp *net.UDPAddr
-		//raddr_tcp *net.TCPAddr
+		//		raddr_tcp *net.TCPAddr
 		err error
 	)
 
@@ -42,13 +42,13 @@ func main() {
 
 	// UDP or TCP
 	if *f {
-		// raddr_tcp, err = net.ResolveTCPAddr("tcp", *r)
+		//		raddr_tcp, err = net.ResolveTCPAddr("tcp", *r)
 	} else {
 		raddr_udp, err = net.ResolveUDPAddr("udp", *r)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+	}
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
 
 	// open local port to listen for incoming connections
