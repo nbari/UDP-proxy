@@ -1,7 +1,7 @@
 package UDPProxy
 
 import (
-	"log"
+	//"log"
 	"net"
 )
 
@@ -15,23 +15,13 @@ type UDPProxy struct {
 }
 
 func New(l *net.UDPConn, r *net.UDPAddr, d bool) (*UDPProxy, error) {
-	rconn, err := net.DialUDP("udp", nil, r)
-	if err != nil {
+	if rconn, err := net.DialUDP("udp", nil, r); err != nil {
 		return nil, err
+	} else {
+		return &UDPProxy{
+			lconn: l,
+			rconn: rconn,
+			debug: d,
+		}, nil
 	}
-	return &UDPProxy{
-		lconn: l,
-		rconn: rconn,
-		debug: d,
-	}, nil
-}
-
-func (self *UDPProxy) Start(data []byte) {
-	n, err := self.rconn.Write(data)
-	if err != nil {
-		log.Println(err)
-	}
-	self.txBytes += uint64(n)
-	log.Printf("Sent Bytes: %d", self.txBytes)
-	//	go self.handlePacket()
 }

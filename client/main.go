@@ -31,7 +31,7 @@ func main() {
 	}
 
 	// receive message from server
-	buffer := make([]byte, 1500)
+	buffer := make([]byte, 1400)
 	conn.SetReadDeadline(time.Now().Add(time.Second * 2))
 	n, addr, err := conn.ReadFromUDP(buffer)
 

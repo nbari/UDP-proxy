@@ -18,7 +18,7 @@ func main() {
 		f         = flag.Bool("f", false, "forward only UDP -> TCP")
 		v         = flag.Bool("v", false, fmt.Sprintf("Print version: %s", version))
 		d         = flag.Bool("d", false, "Debug mode")
-		buffer    = make([]byte, 1500)
+		buffer    = make([]byte, 1400)
 		raddr_udp *net.UDPAddr
 		//		raddr_tcp *net.TCPAddr
 		err error
@@ -80,9 +80,8 @@ func main() {
 			continue
 		}
 		p.Counter++
-		log.Printf("Connections: %d\n", p.Counter)
 		if *d {
-			log.Printf("New connection from %s read bytes: %d", clientAddr.String(), n)
+			log.Printf("New connection from %s read bytes: %d connections: %d", clientAddr.String(), n, p.Counter)
 		}
 		go p.HandlePack(UDPProxy.Packet{clientAddr, buffer[0:n]})
 	}

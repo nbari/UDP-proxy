@@ -11,24 +11,27 @@ type Packet struct {
 }
 
 func (self *UDPProxy) HandlePack(p Packet) {
-	// -> proxy send
 	var (
-		buffer = make([]byte, 1500)
+		buffer = make([]byte, 1400)
 		n      int
 		err    error
 	)
 
-	_, err = self.rconn.Write(p.Data)
-	if err != nil {
-		panic(err)
+	// -> proxy send
+	if _, err = self.rconn.Write(p.Data); err != nil {
+		log.Println(err)
+		return
 	}
 
-	n, err = self.rconn.Read(buffer)
-	log.Println("read size:", n)
+	if n, err = self.rconn.Read(buffer); err != nil {
+		log.Println(err)
+		return
+	}
+	log.Printf("N: %d, read Buffer: %s, %x", n, buffer[0:n], buffer[0:n])
 
 	// <- proxy read
-	_, err = self.lconn.WriteToUDP(buffer[0:n], p.Addr)
-	if err != nil {
+	if _, err = self.lconn.WriteToUDP(buffer[0:n], p.Addr); err != nil {
 		log.Println(err)
+		return
 	}
 }
