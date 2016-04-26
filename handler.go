@@ -27,7 +27,6 @@ func (self *UDPProxy) HandlePack(p Packet) {
 		log.Println(err)
 		return
 	}
-	log.Printf("N: %d, read Buffer: %s, %x", n, buffer[0:n], buffer[0:n])
 
 	// <- proxy read
 	if _, err = self.lconn.WriteToUDP(buffer[0:n], p.Addr); err != nil {
