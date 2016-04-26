@@ -1,6 +1,6 @@
  [ ![Download](https://api.bintray.com/packages/nbari/UDP-proxy/UDP-proxy/images/download.svg) ](https://bintray.com/nbari/UDP-proxy/UDP-proxy/_latestVersion)
 
-# UDP-proxy
+# UDP-proxy (experimental)
 
 **UDP-proxy**, listens on an UDP port (default :1514) and forwards the traffic
 via TCP or UDP to a remote host.
@@ -77,3 +77,9 @@ Run iperf server:
 Connect the client:
 
     iperf -u -c 127.0.0.1 -p 1514 -d
+
+
+Netcat
+======
+
+    echo -n "hello" | nc -4u localhost 1514
