@@ -2,26 +2,35 @@ package UDPProxy
 
 import (
 	"log"
+	"net"
 )
 
-func (self *UDPProxy) handlePacket() {
-	defer self.rconn.Close()
-	var buffer = make([]byte, 1500)
-	for {
-		// Read from server
-		n, err := self.rconn.Read(buffer[0:])
-		if err != nil {
-			log.Printf("Client: %s err: %s", self.caddr.String(), err)
-			return
-		}
-		self.rxBytes += uint64(n)
-		log.Printf("reading size %d rxBytes: %d \n", n, self.rxBytes)
+type Packet struct {
+	Addr *net.UDPAddr
+	Data []byte
+}
 
-		// Relay it to client
-		_, err = self.lconn.WriteToUDP(buffer[0:n], self.caddr)
-		if err != nil {
-			log.Printf("Client: %s err: %s", self.caddr.String(), err)
-			return
-		}
+func (self *UDPProxy) HandlePack(p Packet) {
+	var (
+		buffer = make([]byte, 1400)
+		n      int
+		err    error
+	)
+
+	// -> proxy send
+	if _, err = self.rconn.Write(p.Data); err != nil {
+		log.Println(err)
+		return
+	}
+
+	if n, err = self.rconn.Read(buffer); err != nil {
+		log.Println(err)
+		return
+	}
+
+	// <- proxy read
+	if _, err = self.lconn.WriteToUDP(buffer[0:n], p.Addr); err != nil {
+		log.Println(err)
+		return
 	}
 }
